@@ -1,12 +1,21 @@
 import clsx from "clsx";
-import { useState } from "react";
-import { SlideDown } from "react-slidedown";
-import "react-slidedown/lib/slidedown.css";
+import { useState, useRef, useEffect } from "react";
 
 const FaqItem = ({ item, index }) => {
   const [activeId, setActiveId] = useState(null);
+  const contentRef = useRef(null);
 
   const active = activeId === item.id;
+
+  useEffect(() => {
+    if (contentRef.current) {
+      if (active) {
+        contentRef.current.style.maxHeight = contentRef.current.scrollHeight + "px";
+      } else {
+        contentRef.current.style.maxHeight = "0px";
+      }
+    }
+  }, [active]);
 
   return (
     <div className="relative z-2 mb-16">
@@ -41,11 +50,13 @@ const FaqItem = ({ item, index }) => {
         </div>
       </div>
 
-      <SlideDown>
-        {activeId === item.id && (
-          <div className="body-3 px-7 py-3.5">{item.answer}</div>
-        )}
-      </SlideDown>
+      <div 
+        ref={contentRef}
+        className="overflow-hidden transition-all duration-500 ease-in-out"
+        style={{ maxHeight: active ? 'none' : '0px' }}
+      >
+        <div className="body-3 px-7 py-3.5">{item.answer}</div>
+      </div>
 
       <div
         className={clsx(
